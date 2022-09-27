@@ -27,24 +27,42 @@ func main() {
 	fmt.Println(<-ch)
 
 	//Select
-	queue := make(chan int)
-	done := make(chan bool)
+	// queue := make(chan int)
+	// done := make(chan bool)
 
+	// go func() {
+	// 	for i := 0; i < 10; i++ {
+	// 		queue <- i
+	// 	}
+
+	// 	done <- true
+	// }()
+
+	// for {
+	// 	select {
+	// 	case v := <-queue:
+	// 		fmt.Println(v)
+	// 	case <-done:
+	// 		fmt.Println("done.")
+	// 		return
+	// 	}
+	// }
+
+	//close channel
+
+	queue := make(chan int, 10)
 	go func() {
 		for i := 0; i < 10; i++ {
-			queue <- i
+			if i > 5 {
+				close(queue)
+				break
+			} else {
+				queue <- i
+			}
 		}
-
-		done <- true
 	}()
 
-	for {
-		select {
-		case v := <-queue:
-			fmt.Println(v)
-		case <-done:
-			fmt.Println("done.")
-			return
-		}
+	for value := range queue {
+		fmt.Println(value)
 	}
 }
